@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+{% block cssname %}rel="stylesheet" href="static/css/style-filter.css"{% endblock cssname %}
+
+{% block title %}Image Editor - Amazing Filter{% endblock title %}
+
+{% block contact %}
+<div class="content">
+    <div class="body" id="pageContent">
+        <div class="option">
+            <a id="ad" href="/adjust">Adjustment <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3h9.05zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8h2.05zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1h9.05z"/>
+              </svg></a>
+            <a id="fi" href="/filter">Filter 
+                <img class="fil-img" src="static/img/color.png" alt="" srcset="">
+            </a>
+        </div>  
+        <form action="/apply_filter" method="post" class="filter-form">
+            {% csrf_token %}
+            <div class="setting">
+                <div class="Apply-filter">
+                    <h2 class="setting-name">Choose A Filter</h2>
+                    <div class="head-box">
+                        <div class="box">
+                            <button class="fil-btn" name="filter_type" value="cool">Cool</button>
+                            <button class="fil-btn" name="filter_type" value="warm">Warm</button>
+                            <button class="fil-btn" name="filter_type" value="vintage">Vintage</button>
+                        </div>
+                        <div class="box">
+                            <button class="fil-btn" name="filter_type" value="sepia">Sepia</button>
+                            <button class="fil-btn" name="filter_type" value="grayscale">Grayscale</button>
+                            <button class="fil-btn" name="filter_type" value="sketch">Sketch</button>
+                        </div> 
+                        <div class="box">
+                            <button class="fil-btn" name="filter_type" value="dreamy">Dreamy</button>
+                            <button class="fil-btn" name="filter_type" value="clarendon">Clarendon</button>
+                            <button class="fil-btn" name="filter_type" value="amaro">Amaro</button>
+                        </div>   
+                        <div class="box">
+                            <button class="fil-btn" name="filter_type" value="lark">Lark</button>
+                            <button class="fil-btn" name="filter_type" value="juno">Juno</button>
+                            <button class="fil-btn" name="filter_type" value="xpro_ii">Xpro 11</button>
+                        </div> 
+                        <div class="box">
+                            <button class="fil-btn" name="filter_type" value="vsco">VSCO</button>
+                            <button class="fil-btn" name="filter_type" value="sunned_up">Sunned Up</button>
+                            <button class="fil-btn" name="filter_type" value="invert">Invert</button>
+                        </div> 
+                        <div class="box">
+                            <button class="fil-btn" name="filter_type" value="emboss">Emboss</button>
+                            <button class="fil-btn" name="filter_type" value="gradient">Gradient</button>
+                            <button class="fil-btn" name="filter_type" value="light_sepia">Light Sepia</button>
+                        </div>
+                        <div class="box">
+                            <button class="fil-btn" name="filter_type" value="magenta">Magenta</button>
+                            <button class="fil-btn" name="filter_type" value="tea">Tea</button>
+                            <button class="fil-btn" name="filter_type" value="sunny">Sunny</button>
+                        </div>
+                    </div>                  
+                </div>    
+                <div class="export-setting">
+                        <h2 class="setting-name">Export Settings</h2>
+                        <div class="save">
+                            <p>Save Image As</p>
+                            <select name="format" class="format-input">
+                                <option value="original">ORIGINAL</option>
+                                <option value="jpg">JPG</option>
+                                <option value="png">PNG</option>
+                                <option value="webp">WEBP</option>
+                            </select>
+                        </div>
+                </div>      
+              </div>
+              {% if messages %}
+            <ul class="messages">
+            {% for message in messages %}
+            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+            {% endfor %}
+            </ul>
+            {% endif %}
+            <div class="btn-class">
+                <input name="apply-filter" id="down-btn" class="btn" type="submit" value="Download Image">
+                <input name="remove-filter" id="reset-btn" class="btn" type="submit" value="Remove Filter">
+            </div>
+            
+          </form>        
+     </div>
+    <div class="imgblock">
+        {% if obj.img %}
+        {% if obj.filtered_img %}
+        <div class="image" {% if filter_apply %}style="height: 500px; width: 665px;" {% else %} style="height: 625px; width: 665px;" {% endif %}>
+            <img id="imageDisplay" src="{{obj.filtered_img.url}}" alt="filtered-PHOTO" >
+        </div>
+     
+        <div class="btn-col" {% if filter_apply %}style="display:flex" {% else %} style="display:None" {% endif %}>
+            <form class="down-form" action="/down_filter" method="post">
+                {% csrf_token %}
+                <button name="download" class="download-btn">Download<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                </svg>
+            </button>       
+            <button name="reset-filter" id="compressAgain" class="recom-btn">Reset Setting<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                      </svg>
+            </button>
+        </form>             
+         </div>
+
+        {% elif obj.processed_img %}
+        <div class="image" {% if filter_apply %}style="height: 500px; width: 665px;" {% else %} style="height: 625px; width: 665px;" {% endif %}>
+            <img id="imageDisplay" src="{{obj.processed_img.url}}" alt="processed-PHOTO">
+        </div>
+        {% else %}
+
+        <div class="image" {% if filter_apply %}style="height: 500px; width: 665px;" {% else %} style="height: 625px; width: 665px;" {% endif %}>
+            <img id="imageDisplay" src="{{obj.img.url}}" alt="original-PHOTO">
+        </div>
+        {% endif %}
+    {% endif %}
+    </div>  
+    <div id="leaveConfirmation" class="confirmation-box">
+        <p></p>
+        <div class="confirmation-content">
+          <button id="leaveButton">Leave</button>
+          <button id="cancelButton">Cancel</button>
+        </div>
+      </div> 
+</div>
+{% endblock contact %}
+{% block js %}
+      
+<!-- <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const saturationSlider = document.getElementById("saturation");
+        const brightnessSlider = document.getElementById("brightness");
+        const contrastSlider = document.getElementById("contrast");
+        const imageDisplay = document.getElementById("imageDisplay");
+
+        // Attach event listeners to the sliders
+        saturationSlider.addEventListener("input", updateImageStyle);
+        brightnessSlider.addEventListener("input", updateImageStyle);
+        contrastSlider.addEventListener("input", updateImageStyle);
+
+        function updateImageStyle() {
+            const saturationValue = parseInt(saturationSlider.value);
+            const brightnessValue = parseInt(brightnessSlider.value);
+            const contrastValue = parseInt(contrastSlider.value);
+
+            // Calculate the CSS filter value based on saturation, brightness, and contrast
+            let filterValue = "";
+
+            if (saturationValue >= 0) {
+                filterValue += `saturate(${saturationValue + 100}%) `;
+            } else {
+                filterValue += `grayscale(${Math.abs(saturationValue)}%) `;
+            }
+
+            if (brightnessValue > 0) {
+                filterValue += `brightness(${brightnessValue + 100}%) `;
+            } else if (brightnessValue < 0) {
+                filterValue += `brightness(${100 - (Math.abs(brightnessValue)*0.7)}%) `;
+            }
+
+            if (contrastValue > 0) {
+                filterValue += `contrast(${contrastValue + 100}%) `;
+            } else if (contrastValue < 0) {
+                filterValue += `contrast(${100-(Math.abs(contrastValue)*0.5)}%) `;
+            }
+
+            imageDisplay.style.filter = filterValue.trim(); // Remove extra space at the end
+        }
+    });
+</script> -->
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const leaveConfirmation = document.getElementById('leaveConfirmation');
+      function redirectToSamePage() {
+        window.location.href = 'http://127.0.0.1:8000/adjust';
+    }
+    
+      let targetPageUrl = '';
+      let showConfirmation = false;
+     const pageContent = document.getElementById('pageContent');
+     const navigation = document.getElementById('navigation');
+      
+      // Show the confirmation box when the user tries to leave
+      window.addEventListener('beforeunload', (event) => {
+        if (showConfirmation) {
+          event.preventDefault();
+        }
+      });
+      
+      // Handle leave button click
+      leaveButton.addEventListener('click', () => {
+        if (targetPageUrl) {
+          showConfirmation = false;
+         pageContent.style.pointerEvents = 'auto';
+         navigation.style.pointerEvents = 'auto';
+          window.location.href = targetPageUrl;
+        }
+      });
+      
+      // Handle cancel button click
+      cancelButton.addEventListener('click', () => {
+        showConfirmation = false;
+       pageContent.style.pointerEvents = 'auto';
+       navigation.style.pointerEvents = 'auto';
+        leaveConfirmation.classList.remove('visible');
+      });
+      
+      // Prevent the default behavior of links and show the custom confirmation box
+      const links = document.querySelectorAll('a');
+      links.forEach(link => {
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          if (link.id === 'rst') {
+            // Handle the 'rst' link confirmation
+            targetPageUrl = link.getAttribute('href');
+            showConfirmation = true;
+            pageContent.style.pointerEvents = 'none';
+            navigation.style.pointerEvents = 'none';
+            playWarningSound();
+            leaveConfirmation.classList.add('visible');
+            leaveConfirmation.querySelector('p').textContent = 'Do you want to hard Reset Image?';
+            
+            leaveConfirmation.classList.add('visible');
+          } else {
+            targetPageUrl = link.getAttribute('href');
+            showConfirmation = true;
+            pageContent.style.pointerEvents = 'none';
+            navigation.style.pointerEvents = 'none';
+            playWarningSound();
+            leaveConfirmation.classList.add('visible');
+            leaveConfirmation.querySelector('p').textContent = 'Do you want to leave this page?';
+          }
+        });
+      });
+    
+      // Function to check if leaveConfirmation is visible
+      function leaveConfirmationVisible() {
+        const leaveConfirmation = document.getElementById('leaveConfirmation');
+        return leaveConfirmation && leaveConfirmation.style.display !== 'none';
+      }
+
+  function playWarningSound() {
+    const audio = new Audio('static/sound/alert.wav'); 
+    audio.play();
+  }
+
+        const saturationSlider = document.getElementById("saturation");
+        const brightnessSlider = document.getElementById("brightness");
+        const contrastSlider = document.getElementById("contrast");
+        const sharpenSlider = document.getElementById("sharpen");
+        const blurSlider = document.getElementById("blur");
+        const hueSlider = document.getElementById("hue");
+        const embossSlider = document.getElementById("emboss");
+        const vibranceSlider = document.getElementById("vibrance");
+        const vignetteSlider = document.getElementById("vignette");
+        const imageDisplay = document.getElementById("imageDisplay");
+
+        // Attach event listeners to the sliders
+        saturationSlider.addEventListener("input", updateImageStyle);
+        brightnessSlider.addEventListener("input", updateImageStyle);
+        contrastSlider.addEventListener("input", updateImageStyle);
+       // sharpenSlider.addEventListener("input", updateImageStyle);
+        blurSlider.addEventListener("input", updateImageStyle);
+        hueSlider.addEventListener("input", updateImageStyle);
+     //   vignetteSlider.addEventListener("input", updateImageStyle);
+
+        function updateImageStyle() {
+            const saturationValue = parseInt(saturationSlider.value);
+            const brightnessValue = parseInt(brightnessSlider.value);
+            const contrastValue = parseInt(contrastSlider.value);
+          //  const sharpenValue = parseInt(sharpenSlider.value);
+            const blurValue = parseInt(blurSlider.value);
+            const hueValue = parseInt(hueSlider.value);
+       //     const vignetteValue = parseInt(vignetteSlider.value);
+
+            let filterValue = "";
+
+            if (saturationValue >= 0) {
+                filterValue += `saturate(${saturationValue + 100}%) `;
+            } else {
+                filterValue += `grayscale(${Math.abs(saturationValue)}%) `;
+            }
+
+            if (brightnessValue > 0) {
+                filterValue += `brightness(${brightnessValue + 100}%) `;
+            } else if (brightnessValue < 0) {
+                filterValue += `brightness(${100 - (Math.abs(brightnessValue)*0.7)}%) `;
+            }
+
+            if (contrastValue > 0) {
+                filterValue += `contrast(${contrastValue + 100}%) `;
+            } else if (contrastValue < 0) {
+                filterValue += `contrast(${100 - (Math.abs(contrastValue)*0.7)}%) `;
+            }
+
+            if (blurValue > 0) {
+                filterValue += `blur(${blurValue/8}px) `;
+            }
+
+            if (hueValue !== 0) {
+                filterValue += `hue-rotate(${hueValue*1.5}deg)`;
+            }
+           
+
+            imageDisplay.style.filter = filterValue.trim(); // Remove extra space at the end
+        }
+    });
+
+
+</script>
+
+{% endblock js %}
+

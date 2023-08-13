@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400&family=Montserrat:wght@400;500&family=Space+Grotesk&display=swap"
+        rel="stylesheet">
+     <link rel="stylesheet" href="static/css/style-index.css">
+    <link rel="shortcut icon" href="static/img/img-logo.png" type="image/x-icon">
+    <title>Image Editor - WelCome</title>
+</head>
+<body>
+    <div class="container">
+        <div class="heading">
+            <h1 class="head1">Image Editor</h1>
+            <h2 class="head2">Easily Edit Your images online for free.</h2>
+        </div>
+        <form action="/" class="file-form" id="file-input" method="post" enctype="multipart/form-data" autocomplete="off">
+            {% csrf_token %}
+            <div class="input-box">
+                <label class="input-label" for="pic">Select Image To Upload
+                </label>
+                <input class="input-img" type="file" id="pic" name="in-image" accept=".jpg, .jpeg, .png" />
+            </div>
+            <div >
+                <input class="btn" type="submit" value="Edit Image">
+            </div>    
+        </form>
+
+        <div id="upload-message" style="display: none;"></div>  
+
+        <div class="left-feature">
+            <div class="features">
+                <div class="feature-img1"><img src="static/img/perfection.png" alt=""></div>
+                <h3>Perfect Quality</h3>
+            </div>
+            <div class="features">
+                <div class="feature-img2"><img src="static/img/flash.png" alt=""></div>
+                <h3>Lightning Fast</h3>
+            </div>
+            <div class="features" id="exception">
+                <div class="feature-img3"><img src="static/img/easy.png" alt=""></div>
+                <h3>Easy To Use</h3>
+            </div>
+        </div>
+        <div class="right-feature">
+            <div class="features">
+                <div class="feature-img4"><img src="static/img/work.png" alt=""></div>
+                <h3>Work Anywhere</h3>
+            </div>
+            <div class="features">
+                <div class="feature-img5"><img src="static/img/privacy.png" alt=""></div>
+                <h3>Privacy Guaranteed</h3>
+            </div>
+            <div class="features">
+                <div class="feature-img6"><img src="static/img/free.png" alt=""></div>
+                <h3>Free of Cost</h3>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('pic').addEventListener('change', handleFileChange);
+        function resetFileInput() {
+            const fileInput = document.getElementById('pic');
+            fileInput.value = '';
+        }
+        window.addEventListener('load', function (event) {
+            resetFileInput();
+        });
+        function handleFileChange(event) {
+            const fileInput = event.target;
+            const uploadMessage = document.getElementById('upload-message');
+    
+            if (fileInput.files.length > 0) {
+                const fileName = fileInput.files[0].name;
+                uploadMessage.textContent = `You selected a image file`;
+                uploadMessage.style.display = 'block';
+                uploadMessage.classList.remove('warning')
+                uploadMessage.classList.add('sucess')
+            } else {
+                uploadMessage.textContent = '';
+                uploadMessage.style.display = 'none'; 
+            }
+        }
+
+
+        
+    document.getElementById('file-input').addEventListener('submit', handleSubmit);
+
+    function handleSubmit(event) {
+        const fileInput = document.getElementById('pic');
+        const uploadMessage = document.getElementById('upload-message');
+
+        if (fileInput.files.length === 0) {
+            uploadMessage.textContent = 'Please choose a file.';
+            uploadMessage.style.display = 'block';
+            uploadMessage.classList.remove('sucess')
+            uploadMessage.classList.add('warning')
+
+            event.preventDefault(); 
+        }
+     
+    }
+
+    </script>
+</body>
+</html>

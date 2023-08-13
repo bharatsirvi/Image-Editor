@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block cssname %}rel="stylesheet" href="static/css/style-contact.css"{% endblock cssname %}
+
+{% block title %}Image Editor - Contact Page{% endblock title %}
+{% block contact %}
+        <div class="main" style=" background: url('static/img/contactbg.jpg'); background-repeat: no-repeat; background-size:cover;">
+            
+            <form class="contact-from" method="post">
+                    <h1>Contact Us</h1>
+                    <label>Full Name</label>
+                    <input type="text" name="fullname" placeholder="Enter Your Full Name">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="Enter Your Email Id">
+                    <label>Phone Number</label>
+                    <input type="phone" name="phone" placeholder="Enter Your Phone Number">
+                    <label>Message</label>
+                    <textarea  name="message" rows="4" cols="10">Enter Your Message Here
+                    </textarea>
+                    <input class="submit" type="button" value="Submit">
+            </form>
+        </div>
+        <div class="footer">&copy;2023 Bharat Sirvi. All rights reserved.</div>
+{% endblock contact %}
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400&family=Montserrat:wght@400;500&family=Space+Grotesk&display=swap"
+        rel="stylesheet">
+    <link rel="shortcut icon" href="static/img/img-logo.png" type="image/x-icon">
+    <title></title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .container{
+            width: 100%;
+            height: 100%;
+            background: url("static/img/contact.jpg") no-repeat;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        hello
+    </div>
+</body>
+</html>
+ -->

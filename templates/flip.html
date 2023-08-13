@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block cssname %}rel="stylesheet" href="static/css/style-flip.css"{% endblock cssname %}
+
+{% block title %}Image Editor - Lets Edit{% endblock title %}
+{% block Content %}
+<!-- reshape-from to filp-from  -->
+<form action="/fliprotate" method="post" class="reshape-form">
+    {% csrf_token %}
+    <div class="setting">
+        <!-- resize-setting to filp-setting -->
+        <div class="flip-setting">
+            <h2 class="setting-name">Flip Image</h2>
+            <!-- dim to filp-box-->
+            <div class="flip-box">
+                <!-- wh-box to hv-box-->
+                <div class="hv-box">
+                    <button id="flipHorizontalBtn" name="flip_horizontal" class="img-box">
+                        <img src="static/img/hor-flip.png" alt="">
+                    </button>
+                    <p>Horizontally</p>
+                </div>
+                <div class="hv-box">
+                    <button id="flipVerticalBtn" name="flip_vertical"  class="img-box">
+                        <img src="static/img/ver-flip.png" alt="">
+                    </button>
+                    <p>Vertically</p>
+                </div>
+            </div>
+        </div>
+        <!-- export-setting to rotate-setting -->
+        <div class="rotate-setting">
+            <h2 class="setting-name">Rotate Image</h2>
+            <!-- dim to rotate-box-->
+            <div class="rotate-box">
+                <!-- wh-box to ca-box-->
+                <div class="ca-box">
+                    <button id="rotateClockwiseBtn" name="rotate_clockwise"  class="img-box">
+                        <img src="static/img/Clock.png" alt="">
+                    </button> 
+                    <p>Clock-Wise</p>
+                </div>
+                <div class="ca-box">
+                    <button id="rotateAntiClockwiseBtn" name="rotate_anticlockwise" class="img-box">
+                        <img src="static/img/Anti.png" alt="">
+                    </button>
+                    <p>Counter Clock-Wise</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>          
+{% endblock Content %}
+
+{% block img-block %}
+
+<div class="imgblock">
+    {% if obj.img %}
+        {% if obj.processed_img %}
+        <div class="image">
+            <img id="imageDisplay" src="{{ obj.processed_img.url }}" alt="PROCESSEDPHOTO">
+        </div>
+        {% else %}
+        <div class="image">
+            <img src="{{ obj.img.url }}" alt="ORIGINAL_PHOTO">
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock img-block %}
+
+{% block js %}
+
+{% endblock js %}
+

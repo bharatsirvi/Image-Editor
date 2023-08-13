@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+{% block cssname %}rel="stylesheet" href="static/css/style-main.css"{% endblock cssname %}
+
+{% block title %}Image Editor - Lets Edit{% endblock title %}
+
+{% block Content %}
+<form action="/resize" method="post" class="reshape-form">
+    {% csrf_token %}
+    <div class="setting">
+        <div class="resize-setting">
+            <h2 class="setting-name">Resize Settings</h2>
+           
+            {% if type %}
+            <input type="hidden" name="type" value="dimensions">
+            <div class="way">
+                <a id="way1" style=" background-color: white;" href="/dimensions">Dimensions</a>
+                <a id="way2" style="opacity: 50%;" href="/percentage">As Percentage</a>
+            </div>
+            <div class="dem">
+                <div class="wh-box">
+                    <p>Width</p>
+                    <input class="wh-input" type="number" id="width" name="width" min="0" value="500">
+                </div>
+                <div class="wh-box">
+                    <p>Height</p>
+                    <input class="wh-input" type="number" min="0" name="height" id="height" value="500">
+                </div>
+            </div>
+            <div class="lock-unit">
+                <div class="lock">
+                    <input id="lock-aspect-ratio" type="checkbox" name="aspect-ratio">
+                    <label for="aspect-ratio">
+                        Lock Aspect Ratio
+                    </label>
+                </div>
+                <div class="aspect">
+                    <label for="unit">Unit</label>
+                    <select name="unit" id="unit">
+                        <option value="pixel">Pixel</option>
+                        <option value="inch">Inch</option>
+                        <option value="cm">Centimeter</option>
+                        <option value="mm">Milimeter</option>
+                    </select>
+                </div>
+            </div>
+            {% else %}
+            <input type="hidden" name="type" value="percentage">
+            <div class="way">
+                <a id="way1" style="opacity: 50%;" href="/dimensions">Dimensions</a>
+                <a id="way2" style="background-color: white; opacity: 100%;" href="/percentage">As Percentage</a>
+            </div>
+            <div class="per">
+                <label>Size (In Percentage)</label>
+                <input type="number" name="size-per" value="100" max="200" step="1",min="0">
+            </div>
+            {% endif %}
+           
+        </div>
+        <div class="export-setting">
+            <h2 class="setting-name">Export Settings</h2>
+            <div class="save">
+                <p>Save Image As</p>
+                <select name="format" class="format-input">
+                    <option value="original">ORIGINAL</option>
+                    <option value="jpg">JPG</option>
+                    <option value="png">PNG</option>
+                    <option value="webp">WEBP</option>
+                </select>
+            </div>
+        </div>
+
+    </div>
+    <div class="btn-class" style={% if type %}"padding-top:10px"{% else %}"padding-top:95px"{% endif %}>
+        <input class="btn" onclick="reloadPageAfter2Seconds()" type="submit" value="Download Image">
+    </div>
+</form>      
+{% endblock Content %}
+
+{% block img-block %}
+
+<div class="imgblock">
+    {% if obj.img %}
+        {% if obj.processed_img %}
+        <div class="image" >
+            <img id="imageDisplay" src="{{ obj.processed_img.url }}" alt="PROCESSEDPHOTO">
+        </div>
+        {% else %}
+        <div class="image">
+            <img id="imageDisplay" src="{{ obj.img.url }}" alt="ORIGINAL_PHOTO">
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock img-block %}
+
+
+{% block js %}
+
+
+
+ <!-- {% comment %} <script>
+    //...........................width height.............................
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const widthInput = document.getElementById('width');
+        const heightInput = document.getElementById('height');
+        const imageDisplay = document.getElementById('imageDisplay');
+        
+        const originalWidth = {{ obj.img.width }};
+        const originalHeight = {{ obj.img.height }};
+
+        widthInput.value = originalWidth;
+        heightInput.value = originalHeight;
+        imageDisplay.style.width = `${originalWidth}px`;
+        imageDisplay.style.height = `${originalHeight}px`;
+        
+        let timeoutId = null;
+
+        // Function to update the displayed image size with a slight delay
+        function updateImageSizeWithDelay() {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(updateImageSize, 300); // Adjust the delay here (in milliseconds)
+        }
+
+        // Function to update the displayed image size
+        function updateImageSize() {
+            const newWidth = widthInput.value;
+            const newHeight = heightInput.value;
+            imageDisplay.style.width = `${newWidth}px`;
+            imageDisplay.style.height = `${newHeight}px`;
+        }
+
+        // Event listener for width input change
+        widthInput.addEventListener('input', updateImageSizeWithDelay);
+
+        // Event listener for height input change
+        heightInput.addEventListener('input', updateImageSizeWithDelay);
+
+        // Initial update when the page loads
+        updateImageSize();
+    });
+
+  ////........................lock ............................................
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const widthInput = document.getElementById('width');
+        const heightInput = document.getElementById('height');
+        const lockAspectRatioCheckbox = document.getElementById('lock-aspect-ratio');
+
+        let aspectRatio; // Variable to store the aspect ratio
+
+        // Function to update the displayed image size
+        function updateImageSize() {
+            const newWidth = widthInput.value;
+            const newHeight = heightInput.value;
+
+            if (lockAspectRatioCheckbox.checked && aspectRatio) {
+                // If aspect ratio is locked and aspect ratio is available, update height based on width
+                const newWidthValue = parseInt(newWidth);
+                const newHeightValue = Math.round(newWidthValue / aspectRatio);
+                heightInput.value = newHeightValue;
+                heightInput.disabled = true; // Disable the height input
+                imageDisplay.style.width = `${newWidth}px`;
+                imageDisplay.style.height = `${newHeightValue}px`;
+            } else {
+                // If aspect ratio is not locked or aspect ratio is not available, update width and height independently
+                heightInput.disabled = false; // Enable the height input
+                imageDisplay.style.width = `${newWidth}px`;
+                imageDisplay.style.height = `${newHeight}px`;
+            }
+        }
+
+        // Event listener for width input change
+        widthInput.addEventListener('input', function () {
+            if (lockAspectRatioCheckbox.checked && aspectRatio) {
+                // If aspect ratio is locked and aspect ratio is available, update height based on width
+                const newWidthValue = parseInt(widthInput.value);
+                const newHeightValue = Math.round(newWidthValue / aspectRatio);
+                heightInput.value = newHeightValue;
+            }
+            updateImageSize();
+        });
+
+        // Event listener for height input change
+        heightInput.addEventListener('input', function () {
+            if (!lockAspectRatioCheckbox.checked) {
+                updateImageSize();
+            }
+        });
+
+        // Event listener for lock aspect ratio checkbox
+        lockAspectRatioCheckbox.addEventListener('change', function () {
+            if (lockAspectRatioCheckbox.checked) {
+                // Calculate and store the aspect ratio based on the current width and height values
+                const currentWidthValue = parseInt(widthInput.value);
+                const currentHeightValue = parseInt(heightInput.value);
+                aspectRatio = currentWidthValue / currentHeightValue;
+            }
+            updateImageSize();
+        });
+
+        // Initial update when the page loads
+        updateImageSize();
+    });
+//........................unit,.....................
+
+</script>  {% endcomment %} -->
+
+<script>
+    
+    // Your existing JavaScript code...
+function reloadPageAfter2Seconds() {
+        // Wait for 2 seconds (2000 milliseconds) and then reload the page
+        setTimeout(function () {
+            window.location.reload();
+        }, 100);
+}
+document.addEventListener('DOMContentLoaded', function () {
+    const widthInput = document.getElementById('width');
+    const heightInput = document.getElementById('height');
+    const lockAspectRatioCheckbox = document.getElementById('lock-aspect-ratio');
+
+    // Store the original width and height
+   {% if obj.processed_img %}
+
+        const originalWidth = {{obj.processed_img.width }};
+        const originalHeight = {{ obj.processed_img.height }};
+
+   {% else %}
+
+    const originalWidth = {{ obj.img.width }};
+    const originalHeight = {{ obj.img.height }};
+    
+   {% endif %}
+        
+
+    // Initialize the input fields with the original width and height
+    widthInput.value = originalWidth;
+    heightInput.value = originalHeight;
+
+    let aspectRatio; // Variable to store the aspect ratio
+
+    // Function to update the displayed image size
+    function updateImageSize() {
+        const newWidth = widthInput.value;
+        const newHeight = heightInput.value;
+
+        // Update the displayed image size (if needed)
+        // You can perform any other actions related to the image display here
+
+        // Check if the aspect ratio should be locked
+        if (lockAspectRatioCheckbox.checked && aspectRatio) {
+            // If aspect ratio is locked and aspect ratio is available, update height based on width
+            const newWidthValue = parseInt(newWidth);
+            const newHeightValue = Math.round(newWidthValue / aspectRatio);
+            heightInput.value = newHeightValue;
+            heightInput.disabled = true; // Disable the height input
+        } else {
+            heightInput.disabled = false; // Enable the height input
+        }
+    }
+
+    // Event listener for width input change
+    widthInput.addEventListener('input', function () {
+        if (lockAspectRatioCheckbox.checked && aspectRatio) {
+            // If aspect ratio is locked and aspect ratio is available, update height based on width
+            const newWidthValue = parseInt(widthInput.value);
+            const newHeightValue = Math.round(newWidthValue / aspectRatio);
+            heightInput.value = newHeightValue;
+        }
+        updateImageSize();
+    });
+
+    // Event listener for height input change
+    heightInput.addEventListener('input', function () {
+        if (lockAspectRatioCheckbox.checked) {
+            // If aspect ratio is locked, update width based on height
+            const newHeightValue = parseInt(heightInput.value);
+            const newWidthValue = Math.round(newHeightValue * aspectRatio);
+            widthInput.value = newWidthValue;
+        }
+        updateImageSize();
+    });
+
+    lockAspectRatioCheckbox.addEventListener('change', function () {
+        if (lockAspectRatioCheckbox.checked) {
+            // Calculate and store the aspect ratio based on the current width and height values
+            const currentWidthValue = parseInt(widthInput.value);
+            const currentHeightValue = parseInt(heightInput.value);
+            aspectRatio = currentWidthValue / currentHeightValue;
+        }
+        updateImageSize();
+    });
+
+    updateImageSize();
+});
+
+</script>
+
+  
+{% endblock js %}

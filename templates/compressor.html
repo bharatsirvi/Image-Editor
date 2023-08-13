@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block cssname %}rel="stylesheet" href="static/css/style-compressor.css"{% endblock cssname %}
+
+{% block title %}Image Editor - Lets Compress{% endblock title %}
+{% block contact %}
+<div class="content">
+    <div class="body" id="pageContent">
+        <form action="/compress" method="post" class="compress-form">
+            {% csrf_token %}
+            <div class="setting">
+                <div class="com-setting">
+                    <h2 class="setting-name">Image Compression Setting</h2>
+                    <div class="quality-box">
+                    <p>Quality ( In Percentage )</p>
+                         <div class="com-per">
+                            <input name="quality" type="range" min="0" max="100" value="100" class="range-slider" id="percentage">
+                            <label class="percentage-label" for="percentage">100%</label>
+                          </div> 
+                    </div>         
+                </div>    
+                <div class="export-setting">
+                        <h2 class="setting-name">Export Settings</h2>
+                        <div class="save">
+                            <p>Save Image As</p>
+                            <select name="format" class="format-input">
+                                <option value="original">ORIGINAL</option>
+                                <option value="jpg">JPG</option>
+                                <option value="png">PNG</option>
+                                <option value="webp">WEBP</option>
+                            </select>
+                        </div>
+                </div>      
+              </div>
+              {% if messages %}
+            <ul class="messages">
+            {% for message in messages %}
+            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+            {% endfor %}
+            </ul>
+            {% endif %}
+              <div class="btn-class">
+                <input id="compressButton" class="btn" type="submit" value="Compress Image">
+            </div>
+            
+          </form>        
+     </div>
+    <div class="imgblock">
+        {% if obj.img %}
+        {% if obj.compressed_img %}
+        <div class="image">
+            <img id="imageDisplay" src="{{obj.compressed_img.url}}" alt="compres-PHOTO">
+        </div>
+             <div class="msg-size">  
+          <p>Now Your Image Size is {% if size %}{{size}}kb{% endif %}</p>
+        </div>
+        <div class="btn-col">
+                <form class="down-form" action="/down_compress" method="post">
+                    {% csrf_token %}
+                    <button name="download" class="download-btn">Download<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                        <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                    </svg>
+                </button>       
+                <button id="compressAgain" class="recom-btn">Compress Again<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                          </svg>
+                </button>
+            </form>             
+        </div>
+        {% elif obj.processed_img %}
+        <div class="image">
+            <img id="imageDisplay" src="{{obj.processed_img.url}}" alt="processed-PHOTO">
+        </div>
+        {% else %}
+        <div class="image">
+            <img id="imageDisplay" src="{{obj.img.url}}" alt="original-PHOTO">
+        </div>
+        {% endif %}
+    {% endif %}
+    </div>  
+    <div id="leaveConfirmation" class="confirmation-box">
+      <p>Do you want to leave this page?</p>
+      <div class="confirmation-content">
+        <button id="leaveButton">Leave</button>
+        <button id="cancelButton">Cancel</button>
+      </div>
+    </div> 
+</div>
+{% endblock contact %}
+
+{% block js %}
+<script>
+
+  ////////////////////////////////////////////
+  let targetPageUrl = '';
+  let showConfirmation = false;
+ const pageContent = document.getElementById('pageContent');
+ const navigation = document.getElementById('navigation');
+ const leaveConfirmation = document.getElementById('leaveConfirmation');
+  // Show the confirmation box when the user tries to leave
+  window.addEventListener('beforeunload', (event) => {
+    if (showConfirmation) {
+      event.preventDefault();
+    }
+  });
+  
+  // Handle leave button click
+  leaveButton.addEventListener('click', () => {
+    if (targetPageUrl) {
+      showConfirmation = false;
+     pageContent.style.pointerEvents = 'auto';
+     navigation.style.pointerEvents = 'auto';
+      window.location.href = targetPageUrl;
+    }
+  });
+  
+  // Handle cancel button click
+  cancelButton.addEventListener('click', () => {
+    showConfirmation = false;
+   pageContent.style.pointerEvents = 'auto';
+   navigation.style.pointerEvents = 'auto';
+    leaveConfirmation.classList.remove('visible');
+  });
+  
+  // Prevent the default behavior of links and show the custom confirmation box
+  const links = document.querySelectorAll('a');
+  links.forEach(link => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      if (link.id === 'rst') {
+        // Handle the 'rst' link confirmation
+        targetPageUrl = link.getAttribute('href');
+        showConfirmation = true;
+        pageContent.style.pointerEvents = 'none';
+        navigation.style.pointerEvents = 'none';
+        playWarningSound();
+        
+        leaveConfirmation.querySelector('p').textContent = 'Do you want to hard Reset Image?';
+      } else {
+        // Default behavior for other links
+        targetPageUrl = link.getAttribute('href');
+        showConfirmation = true;
+        pageContent.style.pointerEvents = 'none';
+        navigation.style.pointerEvents = 'none';
+        playWarningSound();
+        leaveConfirmation.classList.add('visible');
+        leaveConfirmation.querySelector('p').textContent = 'Do you want to leave this page?';
+      }
+    });
+  });
+  // Function to check if leaveConfirmation is visible
+  function leaveConfirmationVisible() {
+    const leaveConfirmation = document.getElementById('leaveConfirmation');
+    return leaveConfirmation && leaveConfirmation.style.display !== 'none';
+  }
+
+function playWarningSound() {
+const audio = new Audio('static/sound/alert.wav'); 
+audio.play();
+}
+//////////////////////////////////////////////////////////////
+    const compressionSlider = document.getElementById("percentage");
+    const compressButton = document.getElementById("compressButton");
+    const compressAgainButton = document.getElementById("compressAgain");
+    const resetButton = document.getElementById("rst");
+    const percentageLabel = document.querySelector('.percentage-label');
+
+    let userQualitySetting = parseInt(localStorage.getItem("userQualitySetting")) || 100;
+  
+    compressionSlider.value = userQualitySetting;
+  
+    compressionSlider.addEventListener("input", function () {
+      userQualitySetting = parseInt(compressionSlider.value);
+    });
+  
+    compressButton.addEventListener("click", function () {
+     
+      localStorage.setItem("userQualitySetting", userQualitySetting);
+    });
+    compressAgainButton.addEventListener("click", function () {
+        // Reset the slider value to 100
+        compressionSlider.value = 100;
+        
+        // Update the userQualitySetting
+        userQualitySetting = 100;
+        
+        // Store the updated value in local storage
+        localStorage.setItem("userQualitySetting", userQualitySetting);
+      });
+      window.addEventListener("load", function () {
+        if (window.location.href === "http://127.0.0.1:8000/compressor") {
+          compressionSlider.value = 100;
+          userQualitySetting = 100;
+          localStorage.setItem("userQualitySetting", userQualitySetting);
+          updatePercentageLabel(100);
+        }
+      });
+
+      function updatePercentageLabel(percentage) {
+        percentageLabel.textContent = `${percentage}%`;
+      }
+  
+      // Set initial value
+      updatePercentageLabel(compressionSlider.value);
+
+
+    const rangeSlider = document.getElementById('percentage');
+    
+
+    rangeSlider.addEventListener('input', updatePercentage);
+
+    function updatePercentage() {
+      const percentage = rangeSlider.value;
+      percentageLabel.textContent = `${percentage}%`;
+    }
+
+    // Set initial value
+    updatePercentage();
+
+      // JavaScript
+  
+  </script>
+{% endblock js %}

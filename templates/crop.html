@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block cssname %}rel="stylesheet" href="static/css/style-crop.css"{% endblock cssname %}
+
+{% block title %}Image Editor - Lets Edit{% endblock title %}
+{% block Content %}
+ <!-- classchange reshape-form to crop-form-->
+<form action="/crop_reset" method="post" class="crop-form">
+  {% csrf_token %}
+    <div class="setting">
+        <!-- classchange  resize-setting to crop-setting -->
+        <div class="crop-setting">   
+            <h2 class="setting-name">Crop Rectangle</h2> 
+            <div class="dem">
+                <div class="wh-box">
+                    <p>Width</p>
+                    <input class="wh-input"  id="width" type="number" name="cwidth" min="0" value="500">
+                </div>
+                <div class="wh-box">
+                    <p>Height</p>
+                    <input class="wh-input"  id="height" type="number" min="0" name="cheight" value="500">
+                </div>
+            </div>
+        </div>
+        <!-- classchange export-setting to crop-position-->
+        <div class="crop-position">
+            <h2 class="setting-name">Crop Position</h2>
+            <!-- classchange dem to postion -->
+            <div class="position">
+                <!-- classchange wh-box to xy-box -->
+                <div class="xy-box">
+                    <p>Position (X)</p>
+                     <!-- classchange wh-input to xy-input -->
+                    <input class="xy-input"  id="positionX" type="number" name="position-x" min="0" value="500">
+                </div>
+                <div class="xy-box">
+                    <p>Position (Y)</p>
+                    <input class="xy-input" id="positionY" type="number" min="0" name="position-y" value="500">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="btn-class">
+        <input class="crop-btn btn" name="crop-button" type="submit" value="Crop">
+        <input class="reset-btn btn" name="reset-button" type="submit" value="Reset">
+    </div>
+</form>
+{% endblock Content %}
+
+{% block img-block %}
+
+<div class="imgblock">
+    {% if obj.img %}
+        {%if obj.processed_img %}
+        <div class="image">
+            <img id="imageDisplay" src="{{ obj.processed_img.url }}" alt="PROCESSEDPHOTO">
+        </div>
+        {% else %}
+        <div class="image">
+            <img id="imageDisplay" src="{{ obj.img.url }}" alt="ORIGINAL_PHOTO">
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock img-block %}
+
+
+
+{% block js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var image = document.getElementById("imageDisplay");
+    var cropWidthInput = document.getElementById("width");
+    var cropHeightInput = document.getElementById("height");
+    var positionXInput = document.getElementById("positionX");
+    var positionYInput = document.getElementById("positionY");
+
+    var inputEditing = false; // Variable to track if input fields are being edited manually
+
+    var cropper = new Cropper(image, {
+      viewMode: 2,    // Set view mode to "crop" (enforces crop box within the container)
+      movable: true,  // Enable image movement (user can drag crop box)
+      zoomable: false, // Disable image zooming
+      cropBoxResizable: true, // Allow resizing of the crop box
+      crop: function (event) {
+        var cropData = cropper.getData();
+        var cropWidth = cropData.width;
+        var cropHeight = cropData.height;
+        var paddingX = cropData.x;
+        var paddingY = cropData.y;
+
+        // Update input fields only if they are not being edited manually
+        if (!inputEditing) {
+          cropWidthInput.value = cropWidth.toFixed(0);
+          cropHeightInput.value = cropHeight.toFixed(0);
+          positionXInput.value = paddingX.toFixed(0);
+          positionYInput.value = paddingY.toFixed(0);
+        }
+      },
+    });
+
+    // Add input event listeners to update the crop box instantly when input fields change
+    cropWidthInput.addEventListener("input", function () {
+      inputEditing = true;
+      var newWidth = parseFloat(cropWidthInput.value);
+      if (!isNaN(newWidth)) {
+        cropper.setData({ width: newWidth });
+      }
+      inputEditing = false;
+    });
+
+    cropHeightInput.addEventListener("input", function () {
+      inputEditing = true;
+      var newHeight = parseFloat(cropHeightInput.value);
+      if (!isNaN(newHeight)) {
+        cropper.setData({ height: newHeight });
+      }
+      inputEditing = false;
+    });
+
+    positionXInput.addEventListener("input", function () {
+      inputEditing = true;
+      var newPositionX = parseFloat(positionXInput.value);
+      if (!isNaN(newPositionX)) {
+        cropper.setData({ x: newPositionX });
+      }
+      inputEditing = false;
+    });
+
+    positionYInput.addEventListener("input", function () {
+      inputEditing = true;
+      var newPositionY = parseFloat(positionYInput.value);
+      if (!isNaN(newPositionY)) {
+        cropper.setData({ y: newPositionY });
+      }
+      inputEditing = false;
+    });
+  });
+</script>
+{% endblock js %}
+
+
+
+
+
